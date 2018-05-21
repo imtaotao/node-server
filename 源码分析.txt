@@ -1,0 +1,28 @@
+static-server 部分
+T : 图解http
+Q : http权威指南
+
+	1 一般情况下只允许 get 和 head 方法通过
+	2 否则发送 405 状态码，并且发送一个 Allow：'GET, HEAD' 和 	Content-Length: 0，并 return（T（6.6.1））
+	3 解析客户端发送的 originalUrl 和 pathName
+	4 确保在路径为 '/' 时发生重定向
+	5 创建一个 send stream（核心模块），options 在当前函数做了默认处理后都会传入到这个 send stream
+	6 添加一个重定向的事件，用于决定发生了重定向时的处理，由 onDirectory 属性作回调函数
+	7 添加一个 headers 事件，用来 setheaders
+	8 如果 fallthrough，添加一个 file 事件，用来确定发送文件时产生错误的处理
+	9 添加一个 error 事件，用于处理发生错误时候的事件
+
+有以下几个属性和工具方法需要注意
+	1 onDirectory 根据传入的参数是否觉得自动重定向的函数 createRedirectDirectoryListener 或者 createNotFoundDirectoryListener
+	2 createNotFoundDirectoryListener 返回一个函数，用于发送 404 状态码
+	3 createRedirectDirectoryListener 返回一个函数，用于重定向
+	4 createHtmlDocument 会创建一些 html 字符串，用于返回到客户端
+	5 collapseLeadingSlashes 将所有前导斜杠合并成一个斜线
+
+引入了五个外部包
+	1 encodeurl 主要是用于将 url 编码为百分比编码形式，但不包括已编码的序列
+	2 escape-html 主要是将 字符串转义为 html 字符串
+	3 parseurl 主要解析 req 中的 url
+	4 url 主要格式化 url
+	5 send 就是 send stream 核心流类
+
